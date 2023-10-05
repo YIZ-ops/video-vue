@@ -1,0 +1,89 @@
+<template>
+    <div>
+
+    </div>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            menus: [],
+            expandedKeys: [],
+            defaultProps: {
+                children: 'children',
+                label: 'name',
+            },
+            category: [],
+            title: '',
+            dialogVisible: false,
+        }
+    },
+    methods: {
+        getMenus() {
+            this.$http({
+                url: this.$http.adornUrl('/product/category/list/tree'),
+                method: 'get',
+            }).then(({ data }) => {
+                // console.log('data:', data.data)
+                this.menus = data.data
+            })
+        },
+
+        append(data) {
+            this.title = '添加分类'
+            this.dialogVisible = true
+            console.log('data', data)
+        },
+
+        remove(node, data) {
+            this.$confirm(
+                `此操作将永久删除菜单【${data.name}】，是否继续?`,
+                '提示',
+                {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                }
+            )
+                .then(() => {
+                    var ids = [data.catId]
+                    this.$http({
+                        url: this.$http.adornUrl('/product/category/delete'),
+                        method: 'post',
+                        data: this.$http.adornData(ids, false),
+                    }).then(({ data }) => {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!',
+                        })
+                        // 刷新菜单
+                        this.getMenus()
+                        // 设置需要默认展开的菜单
+                        this.expandedKeys = [node.parent.data.catId]
+                    })
+                })
+                .catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除',
+                    })
+                })
+        },
+    },
+    created() {
+        this.getMenus()
+    },
+}
+</script>
+
+<style>
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+}
+</style>
