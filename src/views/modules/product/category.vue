@@ -7,6 +7,9 @@
             show-checkbox
             :default-expanded-keys="expandedKeys"
             :expand-on-click-node="false"
+            draggable
+            :allow-drop="allowDrop"
+            @node-drop="handleDrop"
         >
             <span
                 class="custom-tree-node"
@@ -46,7 +49,10 @@
             :visible.sync="dialogVisible"
             width="30%"
         >
-            <el-form :model="category">
+            <el-form
+                :model="category"
+                label-width="70px"
+            >
                 <el-form-item label="分类名称">
                     <el-input v-model="category.name"></el-input>
                 </el-form-item>
@@ -75,6 +81,7 @@
 export default {
     data() {
         return {
+            maxLevel: 0,
             menus: [],
             expandedKeys: [],
             defaultProps: {
@@ -112,13 +119,29 @@ export default {
             this.dialogVisible = true
             this.category.parentCid = data.catId
             this.category.catLevel = data.catLevel + 1
+            this.category.catId = null
+            this.category.name = ''
+            this.category.icon = ''
+            this.category.productUnit = ''
         },
 
         edit(data) {
             this.title = '修改分类'
             this.dialogType = 'edit'
             this.dialogVisible = true
-            this.category = data
+            // 发送请求获取当前节点的最新数据
+            this.$http({
+                url: this.$http.adornUrl(
+                    `/product/category/info/${data.catId}`
+                ),
+                method: 'get',
+            }).then(({ data }) => {
+                this.category.catId = data.data.catId
+                this.category.name = data.data.name
+                this.category.icon = data.data.icon
+                this.category.productUnit = data.data.productUnit
+                this.category.parentCid = data.data.parentCid
+            })
         },
 
         remove(node, data) {
@@ -158,36 +181,72 @@ export default {
 
         submitData() {
             if (this.dialogType == 'add') {
-                this.$http({
-                    url: this.$http.adornUrl('/product/category/save'),
-                    method: 'post',
-                    data: this.$http.adornData(this.category, false),
-                }).then(({ data }) => {
-                    this.$message({
-                        type: 'success',
-                        message: '添加成功!',
-                    })
-                    // 刷新菜单
-                    this.getMenus()
-                    // 设置需要默认展开的菜单
-                    this.expandedKeys = [node.parent.data.catId]
+                this.addCategory()
+            } else if (this.dialogType == 'edit') {
+                this.editCategory()
+            }
+        },
+
+        addCategory() {
+            this.$http({
+                url: this.$http.adornUrl('/product/category/save'),
+                method: 'post',
+                data: this.$http.adornData(this.category, false),
+            }).then(({ data }) => {
+                this.$message({
+                    type: 'success',
+                    message: '菜单保存成功!',
                 })
+                this.dialogVisible = false
+                this.getMenus()
+                this.expandedKeys = [this.category.parentCid]
+            })
+        },
+
+        editCategory() {
+            var { catId, name, icon, productUnit } = this.category
+            var data = { catId, name, icon, productUnit }
+            this.$http({
+                url: this.$http.adornUrl('/product/category/update'),
+                method: 'post',
+                data: this.$http.adornData(data, false),
+            }).then(({ data }) => {
+                this.$message({
+                    type: 'success',
+                    message: '菜单修改成功!',
+                })
+                this.dialogVisible = false
+                this.getMenus()
+                this.expandedKeys = [this.category.parentCid]
+            })
+        },
+
+        allowDrop(draggingNode, dropNode, type) {
+            // 被拖拽节点的深度 + 结束拖拽时最后进入的节点的层数 <= 3
+            this.countNodeLevel(draggingNode)
+            // 被拖拽节点的深度 = 被拖拽节点的最大层数 - 被拖拽节点的层数
+            let deep = Math.abs(this.maxLevel - draggingNode.level) + 1
+            if (type == 'inner') {
+                return deep + dropNode.level <= 3
             } else {
-                this.$http({
-                    url: this.$http.adornUrl('/product/category/update'),
-                    method: 'post',
-                    data: this.$http.adornData(this.category, false),
-                }).then(({ data }) => {
-                    this.$message({
-                        type: 'success',
-                        message: '添加成功!',
-                    })
-                    // 刷新菜单
-                    this.getMenus()
-                    // 设置需要默认展开的菜单
-                    this.expandedKeys = [node.parent.data.catId]
+                return deep + dropNode.parent.level <= 3
+            }
+        },
+
+        countNodeLevel(node) {
+            // 找到所有子节点，求出最大深度
+            if (node.childNodes != null && node.childNodes.length > 0) {
+                node.childNodes.forEach((item) => {
+                    if (item.level > this.maxLevel) {
+                        this.maxLevel = item.level
+                    }
+                    this.countNodeLevel(item)
                 })
             }
+        },
+
+        handleDrop(draggingNode, dropNode, dropType, ev) {
+            console.log('tree drop: ', dropNode.label, dropType)
         },
     },
     created() {
