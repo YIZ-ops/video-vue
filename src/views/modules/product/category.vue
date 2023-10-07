@@ -300,7 +300,6 @@ export default {
             }
             this.pCid.push(pCid)
             siblings.forEach((item, index) => {
-                console.log(index, item)
                 // 如果遍历的是当前正在拖拽的节点
                 if (item.data.catId === draggingNode.data.catId) {
                     // 当前节点的层级发生变化
@@ -326,6 +325,7 @@ export default {
             })
             // console.log('updateNodes', this.updateNodes)
         },
+        
 
         updateChildNodeLevel(node) {
             if (node.childNodes.length > 0) {
