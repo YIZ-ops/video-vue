@@ -24,10 +24,7 @@
                 label="品牌logo地址"
                 prop="logo"
             >
-                <el-input
-                    v-model="dataForm.logo"
-                    placeholder="品牌logo地址"
-                ></el-input>
+                <SingleUpload v-model="dataForm.logo"></SingleUpload>
             </el-form-item>
             <el-form-item
                 label="介绍"
@@ -84,7 +81,11 @@
 </template>
 
 <script>
+import SingleUpload from"@/components/upload/singleUpload"
 export default {
+    components: {
+        SingleUpload,
+    },
     data() {
         return {
             visible: false,
