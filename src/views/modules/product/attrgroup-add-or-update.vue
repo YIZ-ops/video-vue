@@ -1,6 +1,6 @@
 <template>
     <el-dialog
-        :title="!dataForm.attrGroupId ? '新增' : '修改'"
+        :title="!dataForm.id ? '新增' : '修改'"
         :close-on-click-modal="false"
         :visible.sync="visible"
         @closed="dialogClose"
@@ -10,7 +10,7 @@
             :rules="dataRule"
             ref="dataForm"
             @keyup.enter.native="dataFormSubmit()"
-            label-width="80px"
+            label-width="120px"
         >
             <el-form-item
                 label="组名"
@@ -52,13 +52,10 @@
                 label="所属分类"
                 prop="catelogId"
             >
-                <el-cascader
-                    v-model="dataForm.catelogPath"
-                    :options="categorys"
-                    :props="props"
-                    placeholder="试试搜索：手机"
-                    filterable
-                ></el-cascader>
+                <!-- <el-input v-model="dataForm.catelogId" placeholder="所属分类id"></el-input> @change="handleChange" -->
+                <!-- <el-cascader filterable placeholder="试试搜索：手机" v-model="catelogPath" :options="categorys"  :props="props"></el-cascader> -->
+                <!-- :catelogPath="catelogPath"自定义绑定的属性，可以给子组件传值 -->
+                <category-cascader :catelogPath.sync="catelogPath"></category-cascader>
             </el-form-item>
         </el-form>
         <span
@@ -75,23 +72,25 @@
 </template>
 
 <script>
+import CategoryCascader from '../common/category-cascader'
 export default {
     data() {
         return {
-            categorys: [],
             props: {
                 value: 'catId',
                 label: 'name',
                 children: 'children',
             },
             visible: false,
+            categorys: [],
+            catelogPath: [],
             dataForm: {
                 attrGroupId: 0,
                 attrGroupName: '',
                 sort: '',
                 descript: '',
                 icon: '',
-                catelogPath: [],
+                catelogId: 0,
             },
             dataRule: {
                 attrGroupName: [
@@ -132,9 +131,11 @@ export default {
             },
         }
     },
+    components: { CategoryCascader },
+
     methods: {
         dialogClose() {
-            this.dataForm.catelogPath = []
+            this.catelogPath = []
         },
         getCategorys() {
             this.$http({
@@ -164,8 +165,8 @@ export default {
                             this.dataForm.descript = data.attrGroup.descript
                             this.dataForm.icon = data.attrGroup.icon
                             this.dataForm.catelogId = data.attrGroup.catelogId
-                            this.dataForm.catelogPath =
-                                data.attrGroup.catelogPath
+                            //查出catelogId的完整路径
+                            this.catelogPath = data.attrGroup.catelogPath
                         }
                     })
                 }
@@ -189,9 +190,7 @@ export default {
                             descript: this.dataForm.descript,
                             icon: this.dataForm.icon,
                             catelogId:
-                                this.dataForm.catelogPath[
-                                    this.dataForm.catelogPath.length - 1
-                                ],
+                                this.catelogPath[this.catelogPath.length - 1],
                         }),
                     }).then(({ data }) => {
                         if (data && data.code === 0) {
