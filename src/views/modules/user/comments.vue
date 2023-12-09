@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('ware:wareinfo:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('ware:wareinfo:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('ware:comments:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('ware:comments:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,25 +26,43 @@
         prop="id"
         header-align="center"
         align="center"
-        label="id">
+        label="">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="fatherCommentId"
         header-align="center"
         align="center"
-        label="仓库名">
+        label="">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="toUserId"
         header-align="center"
         align="center"
-        label="仓库地址">
+        label="">
       </el-table-column>
       <el-table-column
-        prop="areacode"
+        prop="videoId"
         header-align="center"
         align="center"
-        label="区域编码">
+        label="视频id">
+      </el-table-column>
+      <el-table-column
+        prop="fromUserId"
+        header-align="center"
+        align="center"
+        label="留言者，评论的用户id">
+      </el-table-column>
+      <el-table-column
+        prop="comment"
+        header-align="center"
+        align="center"
+        label="评论内容">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        label="">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -73,7 +91,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './wareinfo-add-or-update'
+  import AddOrUpdate from './comments-add-or-update'
   export default {
     data () {
       return {
@@ -100,7 +118,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/ware/wareinfo/list'),
+          url: this.$http.adornUrl('/ware/comments/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -151,7 +169,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/ware/wareinfo/delete'),
+            url: this.$http.adornUrl('/ware/comments/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

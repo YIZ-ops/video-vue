@@ -3,15 +3,12 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
-    <el-form-item label="仓库名" prop="name">
-      <el-input v-model="dataForm.name" placeholder="仓库名"></el-input>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form-item label="用户" prop="userId">
+      <el-input v-model="dataForm.userId" placeholder="用户"></el-input>
     </el-form-item>
-    <el-form-item label="仓库地址" prop="address">
-      <el-input v-model="dataForm.address" placeholder="仓库地址"></el-input>
-    </el-form-item>
-    <el-form-item label="区域编码" prop="areacode">
-      <el-input v-model="dataForm.areacode" placeholder="区域编码"></el-input>
+    <el-form-item label="粉丝" prop="fanId">
+      <el-input v-model="dataForm.fanId" placeholder="粉丝"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -28,19 +25,15 @@
         visible: false,
         dataForm: {
           id: 0,
-          name: '',
-          address: '',
-          areacode: ''
+          userId: '',
+          fanId: ''
         },
         dataRule: {
-          name: [
-            { required: true, message: '仓库名不能为空', trigger: 'blur' }
+          userId: [
+            { required: true, message: '用户不能为空', trigger: 'blur' }
           ],
-          address: [
-            { required: true, message: '仓库地址不能为空', trigger: 'blur' }
-          ],
-          areacode: [
-            { required: true, message: '区域编码不能为空', trigger: 'blur' }
+          fanId: [
+            { required: true, message: '粉丝不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -53,14 +46,13 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/ware/wareinfo/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/ware/usersfans/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.name = data.wareInfo.name
-                this.dataForm.address = data.wareInfo.address
-                this.dataForm.areacode = data.wareInfo.areacode
+                this.dataForm.userId = data.usersFans.userId
+                this.dataForm.fanId = data.usersFans.fanId
               }
             })
           }
@@ -71,13 +63,12 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/ware/wareinfo/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/ware/usersfans/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'name': this.dataForm.name,
-                'address': this.dataForm.address,
-                'areacode': this.dataForm.areacode
+                'userId': this.dataForm.userId,
+                'fanId': this.dataForm.fanId
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

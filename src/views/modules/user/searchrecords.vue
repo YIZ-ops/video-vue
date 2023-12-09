@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('ware:wareordertaskdetail:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('ware:wareordertaskdetail:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('ware:searchrecords:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('ware:searchrecords:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,31 +26,13 @@
         prop="id"
         header-align="center"
         align="center"
-        label="id">
+        label="">
       </el-table-column>
       <el-table-column
-        prop="skuId"
+        prop="content"
         header-align="center"
         align="center"
-        label="sku_id">
-      </el-table-column>
-      <el-table-column
-        prop="skuName"
-        header-align="center"
-        align="center"
-        label="sku_name">
-      </el-table-column>
-      <el-table-column
-        prop="skuNum"
-        header-align="center"
-        align="center"
-        label="购买个数">
-      </el-table-column>
-      <el-table-column
-        prop="taskId"
-        header-align="center"
-        align="center"
-        label="工作单id">
+        label="搜索的内容">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -79,7 +61,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './wareordertaskdetail-add-or-update'
+  import AddOrUpdate from './searchrecords-add-or-update'
   export default {
     data () {
       return {
@@ -106,7 +88,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/ware/wareordertaskdetail/list'),
+          url: this.$http.adornUrl('/ware/searchrecords/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -157,7 +139,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/ware/wareordertaskdetail/delete'),
+            url: this.$http.adornUrl('/ware/searchrecords/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

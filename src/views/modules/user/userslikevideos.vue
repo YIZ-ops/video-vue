@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('ware:wareordertask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('ware:wareordertask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('ware:userslikevideos:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('ware:userslikevideos:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,89 +26,19 @@
         prop="id"
         header-align="center"
         align="center"
-        label="id">
+        label="">
       </el-table-column>
       <el-table-column
-        prop="orderId"
+        prop="userId"
         header-align="center"
         align="center"
-        label="order_id">
+        label="用户">
       </el-table-column>
       <el-table-column
-        prop="orderSn"
+        prop="videoId"
         header-align="center"
         align="center"
-        label="order_sn">
-      </el-table-column>
-      <el-table-column
-        prop="consignee"
-        header-align="center"
-        align="center"
-        label="收货人">
-      </el-table-column>
-      <el-table-column
-        prop="consigneeTel"
-        header-align="center"
-        align="center"
-        label="收货人电话">
-      </el-table-column>
-      <el-table-column
-        prop="deliveryAddress"
-        header-align="center"
-        align="center"
-        label="配送地址">
-      </el-table-column>
-      <el-table-column
-        prop="orderComment"
-        header-align="center"
-        align="center"
-        label="订单备注">
-      </el-table-column>
-      <el-table-column
-        prop="paymentWay"
-        header-align="center"
-        align="center"
-        label="付款方式">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.payment==1">在线付款</el-tag>
-          <el-tag v-if="scope.row.payment==2">货到付款</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="taskStatus"
-        header-align="center"
-        align="center"
-        label="任务状态">
-      </el-table-column>
-      <el-table-column
-        prop="orderBody"
-        header-align="center"
-        align="center"
-        label="订单描述">
-      </el-table-column>
-      <el-table-column
-        prop="trackingNo"
-        header-align="center"
-        align="center"
-        label="物流单号">
-      </el-table-column>
-      <el-table-column
-        prop="createTime"
-        header-align="center"
-        align="center"
-        label="create_time">
-      </el-table-column>
-      <el-table-column
-        prop="wareId"
-        header-align="center"
-        align="center"
-        label="仓库id">
-      </el-table-column>
-      <el-table-column
-        prop="taskComment"
-        header-align="center"
-        align="center"
-        label="工作单备注">
+        label="视频">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -137,7 +67,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './wareordertask-add-or-update'
+  import AddOrUpdate from './userslikevideos-add-or-update'
   export default {
     data () {
       return {
@@ -164,7 +94,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/ware/wareordertask/list'),
+          url: this.$http.adornUrl('/ware/userslikevideos/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -215,7 +145,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/ware/wareordertask/delete'),
+            url: this.$http.adornUrl('/ware/userslikevideos/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
